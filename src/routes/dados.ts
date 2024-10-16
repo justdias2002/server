@@ -40,17 +40,18 @@ export async function memoriesRoutes(app: FastifyInstance) {
         const bodySchema = z.object({
             content: z.string(),
             cover: z.string(),
-            isPublic: z.coerce.boolean().default(false)
+            isPublic: z.coerce.boolean().default(false),
+            userId: z.string().uuid() 
         })
 
-        const { content, cover, isPublic } = bodySchema.parse(request.body)
+        const { content, cover, isPublic, userId } = bodySchema.parse(request.body)
 
         const memory = await prisma.memory.create({
             data: {
                 content,
                 cover,
                 isPublic,
-                userId: 'e9005f7d-e747-4405-a88b-3503ca03cf2c'
+                userId
             },
         })
         return memory
