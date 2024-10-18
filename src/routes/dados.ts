@@ -31,12 +31,12 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
     const { id } = paramsScheme.parse(request.params);
 
-    const memory = prisma.memory.findUniqueOrThrow({
+    const user = prisma.user.findUniqueOrThrow({
       where: {
         id,
       },
     });
-    return memory;
+    return user;
   });
 
   app.post("/memories", async (request) => {
