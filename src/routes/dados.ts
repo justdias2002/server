@@ -20,7 +20,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
         id: memory.id,
         name: memory.user.name, 
         email: memory.user.email,
-        except: memory.content.substring(0, 255), 
+        // except: memory.content.substring(0, 255), 
       };
     });
   });
