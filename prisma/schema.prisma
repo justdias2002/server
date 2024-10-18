@@ -40,19 +40,4 @@ model User {
  name String
  email String
  
-
- memory Memory[]
- 
-}
-
-model Memory {
-  id     String @id @default(uuid())
-  userId String
-
-  
-
-  content  String
-  createAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
 }

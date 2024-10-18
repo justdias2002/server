@@ -4,22 +4,20 @@ import { z } from "zod";
 
 export async function memoriesRoutes(app: FastifyInstance) {
   app.get("/memories", async () => {
-    const memories = await prisma.memory.findMany({
+    const user = await prisma.user.findMany({
       orderBy: {
-        createAt: "asc",
+        name: "asc",
       },
-      include: {
-        user: true,
-      },
+     
     });
 
-    console.log(memories);
+    console.log(user);
 
-    return memories.map((memory: any) => {
+    return user.map((user: any) => {
       return {
-        id: memory.id,
-        name: memory.user.name,
-        email: memory.user.email,
+        id: user.id,
+        name: user.user.name,
+        email: user.user.email,
       };
     });
   });
@@ -69,7 +67,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
     const { name, email } = bodySchema.parse(request.body);
 
-    const memory = prisma.memory.update({
+    const user = prisma.user.update({
       where: {
         id,
       },
@@ -78,7 +76,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
         email
       },
     });
-    return memory;
+    return user;
   });
 
   app.delete("/memories/:id", async (request) => {
@@ -88,7 +86,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
     const { id } = paramsScheme.parse(request.params);
 
-    await prisma.memory.deleteMany({
+    await prisma.user.deleteMany({
       where: {
         id,
       },
