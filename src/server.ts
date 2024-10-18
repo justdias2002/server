@@ -1,7 +1,14 @@
 import fastify from "fastify";
 import { memoriesRoutes } from "./routes/dados";
+import cors from '@fastify/cors'
 
 const app = fastify()
+
+app.register(cors, {
+    // origin: ['https://server-8cgs.onrender.com'],
+    origin: true,
+
+})
 app.register(memoriesRoutes)
 
 
