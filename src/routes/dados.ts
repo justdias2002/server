@@ -3,97 +3,94 @@ import { prisma } from "../lib/prisma";
 import { z } from "zod";
 
 export async function memoriesRoutes(app: FastifyInstance) {
-    app.get('/memories', async () => {
-        const memories = await prisma.memory.findMany({
-            orderBy: {
-                createAt: "asc",
-            }
-        })
-        console.log(memories);
-        return memories.map(memory => {
-            return {
-                id: memory.id,
-                expecpt: memory.content.substring(0, 255),
-            }
-        })
-    })
+  app.get("/memories", async () => {
+    const memories = await prisma.memory.findMany({
+      orderBy: {
+        createAt: "asc",
+      },
+      include: {
+        user: true, 
+      },
+    });
 
-    app.get('/memories/:id', async (request) => {
-        const paramsScheme = z.object({
-            id: z.string().uuid()
-        })
+    console.log(memories);
 
-        const { id } = paramsScheme.parse(request.params)
+    return memories.map((memory) => {
+      return {
+        id: memory.id,
+        name: memory.user.name, 
+        email: memory.user.email,
+        except: memory.content.substring(0, 255), 
+      };
+    });
+  });
 
-        const memory = prisma.memory.findUniqueOrThrow({
-            where: {
-                id,
+  app.get("/memories/:id", async (request) => {
+    const paramsScheme = z.object({
+      id: z.string().uuid(),
+    });
 
-            }
-        })
-        return memory
+    const { id } = paramsScheme.parse(request.params);
 
-    })
+    const memory = prisma.memory.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    });
+    return memory;
+  });
 
-    app.post('/memories', async (request) => {
-        const bodySchema = z.object({
-            content: z.string(),
-            userId: z.string().uuid() 
-        })
+  app.post("/memories", async (request) => {
+    const bodySchema = z.object({
+      content: z.string(),
+      userId: z.string().uuid(),
+    });
 
-        const { content, userId } = bodySchema.parse(request.body)
+    const { content, userId } = bodySchema.parse(request.body);
 
-        const memory = await prisma.memory.create({
-            data: {
-                content,
-                userId
-            },
-        })
-        return memory
+    const memory = await prisma.memory.create({
+      data: {
+        content,
+        userId,
+      },
+    });
+    return memory;
+  });
 
-    })
+  app.put("/memories/:id", async (request) => {
+    const paramsScheme = z.object({
+      id: z.string().uuid(),
+    });
+    const { id } = paramsScheme.parse(request.params);
 
-    app.put('/memories/:id', async (request) => {
+    const bodySchema = z.object({
+      content: z.string(),
+    });
 
-        const paramsScheme = z.object({
-            id: z.string().uuid()
+    const { content } = bodySchema.parse(request.body);
 
-        })
-        const { id } = paramsScheme.parse(request.params)
+    const memory = prisma.memory.update({
+      where: {
+        id,
+      },
+      data: {
+        content,
+      },
+    });
+    return memory;
+  });
 
-        const bodySchema = z.object({
-            
-            content: z.string(),
-           
-        })
+  app.delete("/memories/:id", async (request) => {
+    const paramsScheme = z.object({
+      id: z.string().uuid(),
+    });
 
-        const { content } = bodySchema.parse(request.body)
+    const { id } = paramsScheme.parse(request.params);
 
-        const memory = prisma.memory.update({
-            where: {
-                id,
-            },
-            data: {
-                content,
-            }
-        })
-        return memory
-    })
-
-    app.delete('/memories/:id', async (request) => {
-        const paramsScheme = z.object({
-            id: z.string().uuid()
-        })
-
-        const { id } = paramsScheme.parse(request.params)
-
-        await prisma.memory.deleteMany({
-            where: {
-                id,
-            },
-
-        })
-
-    })
-
+    await prisma.memory.deleteMany({
+      where: {
+        id,
+      },
+    });
+  });
 }

@@ -5,8 +5,9 @@ import cors from '@fastify/cors'
 const app = fastify()
 
 app.register(cors, {
-    // origin: ['https://server-8cgs.onrender.com'],
-    origin: true,
+    origin: ['http://localhost:5173/'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  
+    // origin: true,
 
 })
 app.register(memoriesRoutes)
