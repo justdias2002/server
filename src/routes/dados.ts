@@ -9,18 +9,17 @@ export async function memoriesRoutes(app: FastifyInstance) {
         createAt: "asc",
       },
       include: {
-        user: true, 
+        user: true,
       },
     });
 
     console.log(memories);
 
-    return memories.map((memory) => {
+    return memories.map((memory: any) => {
       return {
         id: memory.id,
-        name: memory.user.name, 
+        name: memory.user.name,
         email: memory.user.email,
-        // except: memory.content.substring(0, 255), 
       };
     });
   });
@@ -64,17 +63,19 @@ export async function memoriesRoutes(app: FastifyInstance) {
     const { id } = paramsScheme.parse(request.params);
 
     const bodySchema = z.object({
-      content: z.string(),
+      name: z.string(),
+      email: z.string()
     });
 
-    const { content } = bodySchema.parse(request.body);
+    const { name, email } = bodySchema.parse(request.body);
 
     const memory = prisma.memory.update({
       where: {
         id,
       },
       data: {
-        content,
+        name,
+        email
       },
     });
     return memory;

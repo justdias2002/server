@@ -7,7 +7,6 @@ const app = fastify()
 app.register(cors, {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true  // Se precisar enviar cookies ou autenticação
     // origin: true,
 
 })
