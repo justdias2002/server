@@ -13,8 +13,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
         return memories.map(memory => {
             return {
                 id: memory.id,
-                cover: memory.cover,
-                expecpt: memory.content.substring(0, 155),
+                expecpt: memory.content.substring(0, 255),
             }
         })
     })
@@ -39,18 +38,14 @@ export async function memoriesRoutes(app: FastifyInstance) {
     app.post('/memories', async (request) => {
         const bodySchema = z.object({
             content: z.string(),
-            cover: z.string(),
-            isPublic: z.coerce.boolean().default(false),
             userId: z.string().uuid() 
         })
 
-        const { content, cover, isPublic, userId } = bodySchema.parse(request.body)
+        const { content, userId } = bodySchema.parse(request.body)
 
         const memory = await prisma.memory.create({
             data: {
                 content,
-                cover,
-                isPublic,
                 userId
             },
         })
@@ -67,10 +62,9 @@ export async function memoriesRoutes(app: FastifyInstance) {
         const { id } = paramsScheme.parse(request.params)
 
         const bodySchema = z.object({
+            
             content: z.string(),
-            // cover: z.string(),
-            // isPublic: z.coerce.boolean().default(false),
-            // userId: z.string().uuid()
+           
         })
 
         const { content } = bodySchema.parse(request.body)
@@ -103,44 +97,3 @@ export async function memoriesRoutes(app: FastifyInstance) {
     })
 
 }
-
-// export async function memoriesRoutes(app: FastifyInstance) {
-//   app.get("/consultaVenda", async () => {
-//     const venda = await prisma.venda.findMany({
-//       orderBy: {
-//         id: "asc",
-//       },
-//     });
-//     // console.log(venda);
-
-//     return venda;
-//   });
-
-//   app.get("/consultaProduto/:id", async (request) => {
-//     const paramsScheme = z.object({
-//       id: z.string().uuid(),
-//       // name: z.string().uuid()  //Para pesquisar com o name adicionar ou trocar "/:id" por "/:name"
-//     });
-
-//     const { id } = paramsScheme.parse(request.params);
-//     // const { name } = paramsScheme.parse(request.params)
-
-//     const produto = prisma.produto.findMany({
-//       where: {
-//         id,
-//         // name
-//       },
-//       select: {
-//         id: true,
-//         // name: true
-//       },
-//     });
-
-//     return produto;
-//   });
- 
-//   app.post("/consultaProduto/:id", async (request) => {
-    
-//   })
-
-// }
