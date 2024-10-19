@@ -3,93 +3,91 @@ import { prisma } from "../lib/prisma";
 import { z } from "zod";
 
 export async function memoriesRoutes(app: FastifyInstance) {
+  
+  //Listar
   app.get("/memories", async () => {
-    const user = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       orderBy: {
         name: "asc",
       },
-     
     });
 
-    console.log(user);
-
-    return user.map((user: any) => {
-      return {
-        id: user.id,
-        name: user.user.name,
-        email: user.user.email,
-      };
-    });
+    return users.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    }));
   });
 
+  //Buscar 
   app.get("/memories/:id", async (request) => {
-    const paramsScheme = z.object({
+    const paramsSchema = z.object({
       id: z.string().uuid(),
     });
 
-    const { id } = paramsScheme.parse(request.params);
+    const { id } = paramsSchema.parse(request.params);
 
-    const user = prisma.user.findUniqueOrThrow({
-      where: {
-        id,
-      },
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id },
     });
-    return user;
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
   });
 
+  //Criar 
   app.post("/memories", async (request) => {
     const bodySchema = z.object({
       name: z.string(),
-      email: z.string(),
-    });
-
-    const { name, email} = bodySchema.parse(request.body);
-
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-      },
-    });
-    return user;
-  });
-
-  app.put("/memories/:id", async (request) => {
-    const paramsScheme = z.object({
-      id: z.string().uuid(),
-    });
-    const { id } = paramsScheme.parse(request.params);
-
-    const bodySchema = z.object({
-      name: z.string(),
-      email: z.string()
+      email: z.string().email(),
     });
 
     const { name, email } = bodySchema.parse(request.body);
 
-    const user = prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-        email
-      },
+    const user = await prisma.user.create({
+      data: { name, email },
     });
+
     return user;
   });
 
+  //Atualizar 
+  app.put("/memories/:id", async (request) => {
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    });
+    const { id } = paramsSchema.parse(request.params);
+
+    const bodySchema = z.object({
+      name: z.string(),
+      email: z.string().email(),
+    });
+
+    const { name, email } = bodySchema.parse(request.body);
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: { name, email },
+    });
+
+    return user;
+  });
+
+  //Remover 
   app.delete("/memories/:id", async (request) => {
-    const paramsScheme = z.object({
+    const paramsSchema = z.object({
       id: z.string().uuid(),
     });
 
-    const { id } = paramsScheme.parse(request.params);
+    const { id } = paramsSchema.parse(request.params);
 
-    await prisma.user.deleteMany({
-      where: {
-        id,
-      },
+    await prisma.user.delete({
+      where: { id },
     });
+
+    return { message: "Usuário deletado com sucesso." };
   });
 }
